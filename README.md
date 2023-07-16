@@ -9,7 +9,7 @@
 
 ## Ссылки на проект
 
-IP-адрес 130.193.38.200
+IP 130.193.38.200
 
 Frontend https://mesto.lusabero.nomoredomains.xyz
 
