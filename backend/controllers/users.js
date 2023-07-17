@@ -50,7 +50,11 @@ const getCurrentUser = (req, res, next) => {
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name,
+    about,
+    avatar,
+    email,
+    password,
   } = req.body;
 
   bcrypt
@@ -85,14 +89,10 @@ const createUser = (req, res, next) => {
 
 const updateUser = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { name, about },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+  User.findByIdAndUpdate(req.user._id, { name, about }, {
+    new: true,
+    runValidators: true,
+  })
     .orFail(() => {
       throw ApiError.notFoundError(
         'Запрашиваемый пользователь не найден (некорректный id)',
@@ -114,14 +114,10 @@ const updateUser = (req, res, next) => {
 
 const updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
+    new: true,
+    runValidators: true,
+  })
     .orFail(() => {
       throw ApiError.notFoundError(
         'Запрашиваемый пользователь не найден (некорректный id)',
@@ -156,7 +152,7 @@ const login = (req, res, next) => {
         .send({ token });
     })
     .catch(() => {
-      throw ApiError.badRequestError('Неправильный логин или пароль');
+      throw ApiError.unauthirizedError();
     })
     .catch(next);
 };
