@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, withRouter } from "react-router-dom";
 
-function Register({onAuthorization}) {
+function Register(props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -15,7 +15,7 @@ function Register({onAuthorization}) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        onAuthorization(email, password);
+        props.onAuthorization(email, password);
     }
     return (
         <section className="authorization" onSubmit={handleSubmit}>
@@ -30,4 +30,4 @@ function Register({onAuthorization}) {
     )
 }
 
-export default Register;
+export default withRouter(Register);

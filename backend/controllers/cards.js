@@ -3,7 +3,9 @@ const Card = require('../models/cards');
 
 const getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => {
+      res.status(200).send(cards);
+    })
     .catch(() => {
       throw ApiError.defaultError();
     })
@@ -46,6 +48,7 @@ const createCard = (req, res, next) => {
         link: card.link,
         owner: card.owner,
         _id: card._id,
+        likes: [],
       });
     })
     .catch((err) => {

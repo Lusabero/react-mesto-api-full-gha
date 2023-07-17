@@ -1,7 +1,6 @@
 class Api {
-    constructor({ url, headers }) {
+    constructor({ url }) {
         this._url = url;
-        this._headers = headers;
     }
 
     _handleRes(res) {
@@ -12,39 +11,57 @@ class Api {
     }
 
     getProfile() {
+        const token  = localStorage.getItem("jwt");
         return fetch(`${this._url}/users/me`, {
-                headers: this._headers
-            })
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+        })
             .then(this._handleRes)
     }
 
     setUserInfo(data) {
+        const token  = localStorage.getItem("jwt");
         return fetch(`${this._url}/users/me`, {
-                method: 'PATCH',
-                headers: this._headers,
-                body: JSON.stringify({
-                    name: data.name,
-                    about: data.about
-                })
+            method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            body: JSON.stringify({
+                name: data.name,
+                about: data.about
             })
+        }
+        )
             .then(this._handleRes)
     }
 
     changeAvatar(avatar) {
+        const token  = localStorage.getItem("jwt");
         return fetch(`${this._url}/users/me/avatar`, {
-                method: 'PATCH',
-                headers: this._headers,
-                body: JSON.stringify({
-                    avatar: avatar.avatar
-                })
+            method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            body: JSON.stringify({
+                avatar: avatar.avatar
             })
+        }
+        )
             .then(this._handleRes)
     }
 
     getInitialCards() {
+        const token  = localStorage.getItem("jwt");
         return fetch(`${this._url}/cards`, {
-                headers: this._headers
-            })
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+        })
             .then(this._handleRes)
     }
 
@@ -55,38 +72,49 @@ class Api {
 
 
     setCard(card) {
+        const token  = localStorage.getItem("jwt");
         return fetch(`${this._url}/cards`, {
-                method: 'POST',
-                headers: this._headers,
-                body: JSON.stringify({
-                    name: card.name,
-                    link: card.link
-                })
+            method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            body: JSON.stringify({
+                name: card.name,
+                link: card.link
             })
+        }
+        )
             .then(this._handleRes)
     }
 
     changeLikeCardStatus(id, isLiked) {
-        return fetch(`${this._url}/cards/likes/${id}`, {
-                method: (isLiked ? "PUT" : "DELETE"),
-                headers: this._headers
-            })
+        const token  = localStorage.getItem("jwt");
+        return fetch(`${this._url}/cards/${id}/likes`, {
+            method: (isLiked ? "PUT" : "DELETE"),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+        })
             .then(this._handleRes)
     }
 
     deleteCard(id) {
+        const token  = localStorage.getItem("jwt");
         return fetch(`${this._url}/cards/${id}`, {
-                method: 'DELETE',
-                headers: this._headers
-            })
+            method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+        }
+        )
             .then(this._handleRes)
     }
 }
 const api = new Api({
     url: 'https://api.mesto.lusabero.nomoredomains.xyz',
-    headers: {
-        'Content-Type': 'application/json'
-    }
 });
 
 export default api;

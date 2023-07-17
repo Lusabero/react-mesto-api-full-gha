@@ -1,42 +1,33 @@
-import {useContext} from "react";
+import React from "react";
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
 
-function Card({card, onCardClick, onCardLike, onCardDelete}) {
-
-    const currentUser = useContext(CurrentUserContext);
-
-    const isOwn = card.owner._id === currentUser._id;
-
+function Card(props) {
+    const currentUser = React.useContext(CurrentUserContext);
+    const isOwn = props.card.owner === currentUser._id;
     const cardDeleteButtonClassName = (
         `element__button-delete ${isOwn ? 'element__button-delete_visible' : 'element__button-delete_hidden'}`
     );
-
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-
+    const isLiked = props.card.likes ? props.card.likes.some(i => i === currentUser._id) : false;
     const cardLikeButtonClassName = (
         `element__like ${isLiked ? 'element__like_active' : ''}`
     );
-
     function handleClick() {
-        onCardClick(card);
+        props.onCardClick(props.card);
     }
-
     function handleLikeClick() {
-        onCardLike(card)
+        props.onCardLike(props.card)
     }
-
     function handleDeleteClick() {
-        onCardDelete(card)
+        props.onCardDelete(props.card)
     }
-
     return (
         <article className="element">
-            <img className="element__image" src={card.link} alt={card.name} onClick={handleClick}/>
+            <img className="element__image" src={props.card.link} alt={props.card.name} onClick={handleClick}/>
             <button className={cardDeleteButtonClassName} onClick={handleDeleteClick}></button>
             <div className="element__wrapper">
-                <h2 className="element__title">{card.name}</h2>
+                <h2 className="element__title">{props.card.name}</h2>
                 <button className={cardLikeButtonClassName} type="button" onClick={handleLikeClick}></button>
-                <p className="element__counter-like">{card.likes.length}</p>
+                <p className="element__counter-like">{props.card.likes ? props.card.likes.length : "0"}</p>
             </div>
         </article>
     )

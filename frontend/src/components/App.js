@@ -4,7 +4,7 @@ import Main from "./Main";
 import Footer from "./Footer";
 import ImagePopup from './ImagePopup';
 import { useEffect, useState } from 'react';
-import { Route, Navigate, useNavigate, Routes } from "react-router-dom";
+import { Route, Redirect, Switch, useHistory } from "react-router-dom";
 import api from "../utils/Api";
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import EditProfilePopup from "./EditProfilePopup";
@@ -28,7 +28,7 @@ function App() {
     const [loggedIn, setLoggedIn] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [userEmail, setUserEmail] = useState('');
-    const navigate = useNavigate();
+    const history = useHistory();
     useEffect(() => {
         api.getProfile()
             .then((data) => {
@@ -37,19 +37,19 @@ function App() {
             .catch((err) => {
                 console.log(err)
             })
-    }, [])
+    }, [loggedIn])
     useEffect(() => {
         api.getInitialCards()
             .then((data) => {
-                setCards(data);
+                setCards([...data]);
             })
             .catch((err) => {
                 console.log(err)
             })
-    }, [])
+    }, [loggedIn])
 
     function handleCardLike(card) {
-        const isLiked = card.likes.some(i => i._id === currentUser._id);
+        const isLiked = card.likes.some(i => i === currentUser._id);
 
         api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
             setCards((state) => state.map((c) => c._id === card._id ? newCard : c))
@@ -129,13 +129,12 @@ function App() {
             })
             .finally(() => setIsLoading(false))
     }
-
     function handleRegistration(email, password) {
         register(email, password)
             .then(() => {
                 setIsSuccess(true);
                 setIsInfoTooltipOpen(true);
-                navigate('/sign-in');
+                history.push('/sign-in');
             })
             .catch((err) => {
                 console.log(err);
@@ -147,108 +146,88 @@ function App() {
     function handleAuthorization(email, password) {
         login(email, password)
             .then((data) => {
-                if (data.token) {
+                if (email) {
                     setUserEmail(email)
                     setLoggedIn(true);
-                    navigate('/');
+                    history.push('/');
                 }
             })
             .catch((err) => {
                 console.log(err);
-                setIsSuccess(false);
-                setIsInfoTooltipOpen(true);
             })
     }
+
     useEffect(() => {
         const jwt = localStorage.getItem('jwt');
         if (jwt) {
             checkToken(jwt)
                 .then((res) => {
-                    setUserEmail(res.data.email);
+                    setUserEmail(res.email);
                     setLoggedIn(true);
-                    navigate('/');
+                    history.push('/');
                 })
                 .catch((err) => {
                     console.log(err);
                 })
         }
-    }, [navigate])
-
+    }, [history])
     function handleSignOut() {
         localStorage.removeItem('jwt');
-        navigate('/sign-in');
+        history.push('/sign-in');
         setLoggedIn(false);
         setUserEmail('');
     }
-    return ( <
-            CurrentUserContext.Provider value = { currentUser } >
-            <
-            div className = "root__wrapper" >
-            <
-            Header email = { userEmail }
-            loggedIn = { loggedIn }
-            handleSignOut = { handleSignOut }
-            /> <
-            Routes >
-            <
-            Route path = "/"
-            element = { <
-                ProtectedRoute
-                loggedIn = { loggedIn }
-                component = { Main }
-                onEditProfile = { handleEditProfileClick }
-                onAddPlace = { handleAddPlaceClick }
-                onEditAvatar = { handleEditAvatarClick }
-                onCardClick = { handleCardClick }
-                cards = { cards }
-                onCardLike = { handleCardLike }
-                onCardDelete = { handleCardDelete }
+    return (
+        <CurrentUserContext.Provider value={currentUser}>
+            <div className="root__wrapper">
+                <Header
+                    email={userEmail}
+                    loggedIn={loggedIn}
+                    handleSignOut={handleSignOut}
                 />
-            }
-            /> <
-            Route path = "/sign-up"
-            element = { < Register onAuthorization = { handleRegistration }
-                />} / >
-                <
-                Route path = "/sign-in"
-                element = { < Login onLogin = { handleAuthorization }
-                    />} / >
-                    <
-                    Route path = "/*"
-                    element = { loggedIn ? < Navigate to = "/" / > : < Navigate to = "/sign-in" / > }
-                    /> <
-                    /Routes> <
-                    Footer / >
-                    <
-                    /div> <
-                    EditProfilePopup isOpen = { isEditProfilePopupOpen }
-                    onClose = { closeAllPopups }
-                    onUpdateUser = { handleUpdateUser }
-                    isLoading = { isLoading }
-                    /> <
-                    EditAvatarPopup isOpen = { isEditAvatarPopupOpen }
-                    onClose = { closeAllPopups }
-                    onUpdateAvatar = { handleUpdateAvatar }
-                    isLoading = { isLoading }
-                    /> <
-                    AddPlacePopup isOpen = { isAddPlacePopupOpen }
-                    onClose = { closeAllPopups }
-                    onAddPlace = { handleAddPlaceSubmit }
-                    isLoading = { isLoading }
-                    /> <
-                    ImagePopup
-                    card = { selectedCard }
-                    onClose = { closeAllPopups }
-                    /> <
-                    InfoTooltip
-                    isOpen = { isInfoTooltipOpen }
-                    onClose = { closeAllPopups }
-                    isSuccess = { isSuccess }
+                <Switch>
+                    <ProtectedRoute
+                        exact path="/"
+                        loggedIn={loggedIn}
+                        component={Main}
+                        onEditProfile={handleEditProfileClick}
+                        onAddPlace={handleAddPlaceClick}
+                        onEditAvatar={handleEditAvatarClick}
+                        onCardClick={handleCardClick}
+                        cards={cards}
+                        onCardLike={handleCardLike}
+                        onCardDelete={handleCardDelete}
                     />
+                    <Route exact path="/sign-up">
+                        <Register onAuthorization={handleRegistration} />
+                    </Route>
+                    <Route exact path="/sign-in">
+                        <Login onLogin={handleAuthorization} />
+                    </Route>
+                    <Route path="/">
+                        {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+                    </Route>
+                </Switch>
+                <Footer />
+            </div>
+            <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}
+                isLoading={isLoading} />
+            <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}
+                isLoading={isLoading} />
+            <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}
+                isLoading={isLoading} />
+            <ImagePopup
+                card={selectedCard}
+                onClose={closeAllPopups}
+            />
+            <InfoTooltip
+                isOpen={isInfoTooltipOpen}
+                onClose={closeAllPopups}
+                isSuccess={isSuccess}
+            />
 
-                    <
-                    /CurrentUserContext.Provider>
-                );
-            }
+        </CurrentUserContext.Provider>
+    );
+}
 
-            export default App;
+export default App;

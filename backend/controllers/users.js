@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 const { ApiError } = require('../errors/ApiError');
 
+const { JWT_SECRET = 'some-secret-key' } = process.env;
+
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -141,7 +143,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
       res
@@ -151,10 +153,10 @@ const login = (req, res, next) => {
           sameSite: true,
         })
         .status(200)
-        .send({ message: 'Авторизация прошла успешно!' });
+        .send({ token });
     })
     .catch(() => {
-      throw ApiError.unauthirizedError();
+      throw ApiError.badRequestError('Неправильный логин или пароль');
     })
     .catch(next);
 };

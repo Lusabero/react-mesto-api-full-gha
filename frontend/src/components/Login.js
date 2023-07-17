@@ -1,6 +1,7 @@
-import {useState} from "react";
+import React, { useState } from "react";
+import { withRouter } from "react-router-dom";
 
-function Login({onLogin}) {
+function Login(props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -14,7 +15,7 @@ function Login({onLogin}) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        onLogin(email, password);
+        props.onLogin(email, password);
     }
     return (
         <section className="authorization" onSubmit={handleSubmit}>
@@ -28,4 +29,4 @@ function Login({onLogin}) {
     )
 }
 
-export default Login;
+export default withRouter(Login);

@@ -1,31 +1,27 @@
-import {useEffect, useState} from "react";
+import React from "react";
 import PopupWithForm from './PopupWithForm';
 
-function AddPlacePopup({onAddPlace, onClose, isOpen, isLoading}) {
-
-    const [name, setName] = useState('');
-    const [link, setLink] = useState('');
-
+function AddPlacePopup(props) {
+    const [name, setName] = React.useState('');
+    const [link, setLink] = React.useState('');
     function handleSubmit(e) {
         e.preventDefault();
-        onAddPlace({
+        props.onAddPlace({
             name,
             link,
         });
-    }
-
-    useEffect(() => {
-        setName('')
-        setLink('')
-    }, [isOpen])
-
+    };
+    React.useEffect(() => {
+        setName('');
+        setLink('');
+    }, [props.isOpen]);
     return (
         <PopupWithForm
             name="element"
             title="Новое место"
-            isOpen={isOpen}
-            buttonTitle={isLoading ? "Сохранение..." : "Создать"}
-            onClose={onClose}
+            isOpen={props.isOpen}
+            buttonTitle={props.isLoading ? "Сохранение..." : "Создать"}
+            onClose={props.onClose}
             onSubmit={handleSubmit}
         >
             <label className="popup__label">

@@ -1,10 +1,11 @@
+import React from 'react';
 import logo from "../images/logo.svg";
 import { Link, useLocation } from "react-router-dom";
 
 function Header(props) {
     const pathName = useLocation().pathname;
-    const path = `${pathName === '/sign-up' ? '/sign-in' : '/sign-up'}`;
-    const text = `${pathName === '/sign-up' ? 'Войти' : 'Регистрация'}`;
+    const path = `${pathName == '/sign-up' ? '/sign-in' : '/sign-up'}`;
+    const text = `${pathName == '/sign-up' ? 'Войти' : 'Регистрация'}`;
     return (
         <header className="header">
             <img className="header__logo" src={logo} alt="логотип проекта Место" />
