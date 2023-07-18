@@ -129,6 +129,7 @@ function App() {
             })
             .finally(() => setIsLoading(false))
     }
+
     function handleRegistration(email, password) {
         register(email, password)
             .then(() => {
@@ -154,6 +155,8 @@ function App() {
             })
             .catch((err) => {
                 console.log(err);
+                setIsSuccess(false);
+                setIsInfoTooltipOpen(true);
             })
     }
 
@@ -171,62 +174,76 @@ function App() {
                 })
         }
     }, [history])
+
     function handleSignOut() {
         localStorage.removeItem('jwt');
         history.push('/sign-in');
         setLoggedIn(false);
         setUserEmail('');
     }
-    return (
-        <CurrentUserContext.Provider value={currentUser}>
-            <div className="root__wrapper">
-                <Header
-                    email={userEmail}
-                    loggedIn={loggedIn}
-                    handleSignOut={handleSignOut}
-                />
-                <Switch>
-                    <ProtectedRoute
-                        exact path="/"
-                        loggedIn={loggedIn}
-                        component={Main}
-                        onEditProfile={handleEditProfileClick}
-                        onAddPlace={handleAddPlaceClick}
-                        onEditAvatar={handleEditAvatarClick}
-                        onCardClick={handleCardClick}
-                        cards={cards}
-                        onCardLike={handleCardLike}
-                        onCardDelete={handleCardDelete}
-                    />
-                    <Route exact path="/sign-up">
-                        <Register onAuthorization={handleRegistration} />
-                    </Route>
-                    <Route exact path="/sign-in">
-                        <Login onLogin={handleAuthorization} />
-                    </Route>
-                    <Route path="/">
-                        {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
-                    </Route>
-                </Switch>
-                <Footer />
-            </div>
-            <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}
-                isLoading={isLoading} />
-            <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}
-                isLoading={isLoading} />
-            <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}
-                isLoading={isLoading} />
-            <ImagePopup
-                card={selectedCard}
-                onClose={closeAllPopups}
-            />
-            <InfoTooltip
-                isOpen={isInfoTooltipOpen}
-                onClose={closeAllPopups}
-                isSuccess={isSuccess}
-            />
+    return ( <
+        CurrentUserContext.Provider value = { currentUser } >
+        <
+        div className = "root__wrapper" >
+        <
+        Header email = { userEmail }
+        loggedIn = { loggedIn }
+        handleSignOut = { handleSignOut }
+        /> <
+        Switch >
+        <
+        ProtectedRoute exact path = "/"
+        loggedIn = { loggedIn }
+        component = { Main }
+        onEditProfile = { handleEditProfileClick }
+        onAddPlace = { handleAddPlaceClick }
+        onEditAvatar = { handleEditAvatarClick }
+        onCardClick = { handleCardClick }
+        cards = { cards }
+        onCardLike = { handleCardLike }
+        onCardDelete = { handleCardDelete }
+        /> <
+        Route exact path = "/sign-up" >
+        <
+        Register onAuthorization = { handleRegistration }
+        /> <
+        /Route> <
+        Route exact path = "/sign-in" >
+        <
+        Login onLogin = { handleAuthorization }
+        /> <
+        /Route> <
+        Route path = "/" > { loggedIn ? < Redirect to = "/" / > : < Redirect to = "/sign-in" / > } <
+        /Route> <
+        /Switch> <
+        Footer / >
+        <
+        /div> <
+        EditProfilePopup isOpen = { isEditProfilePopupOpen }
+        onClose = { closeAllPopups }
+        onUpdateUser = { handleUpdateUser }
+        isLoading = { isLoading }
+        /> <
+        EditAvatarPopup isOpen = { isEditAvatarPopupOpen }
+        onClose = { closeAllPopups }
+        onUpdateAvatar = { handleUpdateAvatar }
+        isLoading = { isLoading }
+        /> <
+        AddPlacePopup isOpen = { isAddPlacePopupOpen }
+        onClose = { closeAllPopups }
+        onAddPlace = { handleAddPlaceSubmit }
+        isLoading = { isLoading }
+        /> <
+        ImagePopup card = { selectedCard }
+        onClose = { closeAllPopups }
+        /> <
+        InfoTooltip isOpen = { isInfoTooltipOpen }
+        onClose = { closeAllPopups }
+        isSuccess = { isSuccess }
+        />
 
-        </CurrentUserContext.Provider>
+        <
+        /CurrentUserContext.Provider>
     );
 }
 
